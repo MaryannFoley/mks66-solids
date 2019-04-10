@@ -3,7 +3,40 @@ from matrix import *
 from gmath import *
 
 def scanline_convert(polygons, i, screen, zbuffer ):
-    pass
+    if len(polygons) < 2:
+        print 'Need at least 3 points to draw'
+        return
+
+    point = 0
+    while point < len(polygons) - 2:
+        points = polygons[point:point+3]
+        points.sort(key=lambda x: x[1])
+
+        normal = calculate_normal(polygons, point)[:]
+        #print normal
+        if normal[2] > 0:
+            draw_line( int(polygons[point][0]),
+                       int(polygons[point][1]),
+                       polygons[point][2],
+                       int(polygons[point+1][0]),
+                       int(polygons[point+1][1]),
+                       polygons[point+1][2],
+                       screen, zbuffer, color)
+            draw_line( int(polygons[point+2][0]),
+                       int(polygons[point+2][1]),
+                       polygons[point+2][2],
+                       int(polygons[point+1][0]),
+                       int(polygons[point+1][1]),
+                       polygons[point+1][2],
+                       screen, zbuffer, color)
+            draw_line( int(polygons[point][0]),
+                       int(polygons[point][1]),
+                       polygons[point][2],
+                       int(polygons[point+2][0]),
+                       int(polygons[point+2][1]),
+                       polygons[point+2][2],
+                       screen, zbuffer, color)
+        point+= 3
 
 def add_polygon( polygons, x0, y0, z0, x1, y1, z1, x2, y2, z2 ):
     add_point(polygons, x0, y0, z0)
