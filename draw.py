@@ -4,6 +4,7 @@ from gmath import *
 import random
 
 def scanline_convert(polygons, i, screen, zbuffer ):
+    print("scanline_convert")
     color = [int(random.randrange(0,256,1)),255,int(random.randrange(0,256,1))]
     points=[polygons[i],polygons[i+1],polygons[i+2]]
     if points[0][2]<points[1][2] and points[0][2]<points[2][2]:
@@ -31,45 +32,63 @@ def scanline_convert(polygons, i, screen, zbuffer ):
             m=points[1]
             t=points[0]
 
-
-    mTopBottom=(t[0]-b[0])/(t[1]-b[1])
-    inc2=1/mTopBottom
-    mTopBottomz=(t[0]-b[0])/(t[1]-b[1])
-    inc4=1/mTopBottomz
-    if t[1] != m[1]:
-        m1z=(t[0]-m[0])/(t[1]-m[1])
-        inc3=1/m1z
-        m1=(t[0]-m[0])/(t[1]-m[1])
-        inc1=1/m1
-        y = t[1]
-        x1=t[0]
-        x2=t[0]
-        z1=t[2]
-        z2=t[2]
-        while y>=m[1]:
-            draw_line(int(x1),int(y),int(z1),int(x2),int(y),int(z2),screen,zbuffer,color)
-            y-=1
-            x1-=inc1
-            x2-=inc2
-            z1-=inc3
-            z1-=inc4
-    if b[1]!=m[1]:
-        m1=(m[0]-b[0])/(m[1]-b[1])
-        inc1=1/m1
-        m1z=(m[0]-b[0])/(m[1]-b[1])
-        inc3=1/m1
-        y = b[1]
-        x1=b[0]
-        x2=b[0]
-        z1=b[2]
-        z2=b[2]
-        while y<=m[1]:
-            draw_line(int(x1),int(y),int(z1),int(x2),int(y),int(z2),screen,zbuffer,color)
-            y+=1
-            x1+=inc1
-            x2+=inc2
-            z1+=inc3
-            z1+=inc4
+    if t[1] != b[1]:
+        mTopBottom=(t[0]-b[0])/(t[1]-b[1])
+        if mTopBottom ==0:
+            inc2=0
+        else:
+            inc2=1/mTopBottom
+        mTopBottomz=(t[2]-b[2])/(t[1]-b[1])
+        if mTopBottomz ==0:
+            inc4=0
+        else:
+            inc4=1/mTopBottomz
+        if t[1] != m[1]:
+            m1z=(t[2]-m[2])/(t[1]-m[1])
+            if m1z ==0:
+                inc3 =0
+            else:
+                inc3=1/m1z
+            m1=(t[0]-m[0])/(t[1]-m[1])
+            if m1 ==0:
+                inc1 =0
+            else:
+                inc1=1/m1
+            y = t[1]
+            x1=t[0]
+            x2=t[0]
+            z1=t[2]
+            z2=t[2]
+            while y>=m[1]:
+                draw_line(int(x1),int(y),int(z1),int(x2),int(y),int(z2),screen,zbuffer,color)
+                y-=1
+                x1-=inc1
+                x2-=inc2
+                z1-=inc3
+                z1-=inc4
+        if b[1]!=m[1]:
+            m1=(m[0]-b[0])/(m[1]-b[1])
+            m1z=(m[2]-b[2])/(m[1]-b[1])
+            if m1z ==0:
+                inc3 =0
+            else:
+                inc3=1/m1z
+            if m1 ==0:
+                inc1 =0
+            else:
+                inc1=1/m1
+            y = b[1]
+            x1=b[0]
+            x2=b[0]
+            z1=b[2]
+            z2=b[2]
+            while y<=m[1]:
+                draw_line(int(x1),int(y),int(z1),int(x2),int(y),int(z2),screen,zbuffer,color)
+                y+=1
+                x1+=inc1
+                x2+=inc2
+                z1+=inc3
+                z1+=inc4
 
 
 def add_polygon( polygons, x0, y0, z0, x1, y1, z1, x2, y2, z2 ):
@@ -79,7 +98,7 @@ def add_polygon( polygons, x0, y0, z0, x1, y1, z1, x2, y2, z2 ):
 
 def draw_polygons( polygons, screen, zbuffer, color ):
     if len(polygons) < 2:
-        print 'Need at least 3 points to draw'
+        print('Need at least 3 points to draw')
         return
 
     point = 0
@@ -88,6 +107,7 @@ def draw_polygons( polygons, screen, zbuffer, color ):
         normal = calculate_normal(polygons, point)[:]
         #print normal
         if normal[2] > 0:
+            scanline_convert(polygons,point,screen,zbuffer)
             draw_line( int(polygons[point][0]),
                        int(polygons[point][1]),
                        polygons[point][2],
@@ -297,7 +317,7 @@ def add_curve( points, x0, y0, x1, y1, x2, y2, x3, y3, step, curve_type ):
 
 def draw_lines( matrix, screen, zbuffer, color ):
     if len(matrix) < 2:
-        print 'Need at least 2 points to draw'
+        print('Need at least 2 points to draw')
         return
 
     point = 0
