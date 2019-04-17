@@ -14,7 +14,7 @@ def scanline_convert(polygons, i, screen, zbuffer ):
         else:
             m=points[2]
             t=points[1]
-    if points[1][2]<points[0][2] and points[1][2]<points[2][2]:
+    elif points[1][2]<points[0][2] and points[1][2]<points[2][2]:
         b=points[1]
         if points[0][2]<points[2][2]:
             m=points[0]
@@ -22,7 +22,7 @@ def scanline_convert(polygons, i, screen, zbuffer ):
         else:
             m=points[2]
             t=points[0]
-    if points[2][2]<points[1][2] and points[2][2]<points[0][2]:
+    else:
         b=points[2]
         if points[0][2]<points[1][2]:
             m=points[0]
@@ -33,42 +33,43 @@ def scanline_convert(polygons, i, screen, zbuffer ):
 
 
     mTopBottom=(t[0]-b[0])/(t[1]-b[1])
-    m1=(t[0]-m[0])/(t[1]-m[1])
-    inc1=1/m1
     inc2=1/mTopBottom
     mTopBottomz=(t[0]-b[0])/(t[1]-b[1])
-    m1z=(t[0]-m[0])/(t[1]-m[1])
-    inc3=1/m1
-    inc4=1/mTopBottom
-    y = t[1]
-    x1=t[0]
-    x2=t[0]
-    z1=t[2]
-    z2=t[2]
-    while y>=m[1]:
-        draw_line(int(x1),y,int(z1),int(x2),y,int(z2),screen,zbuffer,color)
-        y-=1
-        x1-=inc1
-        x2-=inc2
-        z1-=inc3
-        z1-=inc4
-
-    m1=(t[0]-m[0])/(t[1]-m[1])
-    inc1=1/m1
-    m1z=(t[0]-m[0])/(t[1]-m[1])
-    inc3=1/m1
-    y = b[1]
-    x1=b[0]
-    x2=b[0]
-    z1=b[2]
-    z2=b[2]
-    while y>=m[1]:
-        draw_line(int(x1),y,int(z1),int(x2),y,int(z2),screen,zbuffer,color)
-        y+=1
-        x1+=inc1
-        x2+=inc2
-        z1+=inc3
-        z1+=inc4
+    inc4=1/mTopBottomz
+    if t[1] != m[1]:
+        m1z=(t[0]-m[0])/(t[1]-m[1])
+        inc3=1/m1z
+        m1=(t[0]-m[0])/(t[1]-m[1])
+        inc1=1/m1
+        y = t[1]
+        x1=t[0]
+        x2=t[0]
+        z1=t[2]
+        z2=t[2]
+        while y>=m[1]:
+            draw_line(int(x1),int(y),int(z1),int(x2),int(y),int(z2),screen,zbuffer,color)
+            y-=1
+            x1-=inc1
+            x2-=inc2
+            z1-=inc3
+            z1-=inc4
+    if b[1]!=m[1]:
+        m1=(m[0]-b[0])/(m[1]-b[1])
+        inc1=1/m1
+        m1z=(m[0]-b[0])/(m[1]-b[1])
+        inc3=1/m1
+        y = b[1]
+        x1=b[0]
+        x2=b[0]
+        z1=b[2]
+        z2=b[2]
+        while y<=m[1]:
+            draw_line(int(x1),int(y),int(z1),int(x2),int(y),int(z2),screen,zbuffer,color)
+            y+=1
+            x1+=inc1
+            x2+=inc2
+            z1+=inc3
+            z1+=inc4
 
 
 def add_polygon( polygons, x0, y0, z0, x1, y1, z1, x2, y2, z2 ):
@@ -108,6 +109,7 @@ def draw_polygons( polygons, screen, zbuffer, color ):
                        int(polygons[point+2][1]),
                        polygons[point+2][2],
                        screen, zbuffer, color)
+            scanline_convert(polygons,point,screen,zbuffer)
         point+= 3
 
 

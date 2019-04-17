@@ -2,6 +2,7 @@ from display import *
 from draw import *
 from parser import *
 from matrix import *
+import random
 import math
 
 screen = new_screen()
